@@ -1,0 +1,66 @@
+FUNCTION_BLOCK MaasHesapla
+
+VAR_INPUT
+	egitimSuresi : REAL;
+	tecrube : REAL;
+	cinsiyet : REAL;
+END_VAR
+
+VAR_OUTPUT
+	maas : REAL;
+END_VAR
+
+FUZZIFY egitimSuresi
+	TERM az := (0,1)(1,0);
+	TERM orta := (1,0)(2,1)(3,1)(4,0);
+	TERM cok := (3,0)(4,1)(5,1);
+END_FUZZIFY
+
+FUZZIFY tecrube
+	TERM az := (0,0)(1,1)(2,1)(3,0);
+	TERM orta := (2,0)(4,1)(5,0);
+	TERM cok := (4,0)(6,1)(10,1);
+END_FUZZIFY
+
+FUZZIFY cinsiyet
+	TERM erkek := (1,1);
+	TERM kadin := (2,1);
+END_FUZZIFY
+
+DEFUZZIFY maas
+	TERM cokAz := (0,0)(1,1)(2,0);
+	TERM az := (1,0)(2,1)(3,1)(4,0);
+	TERM orta := (3,0)(5,1)(7,1)(8,0);
+	TERM fazla := (7,0)(8,1)(9,1)(10,0);
+	TERM asiriFazla := (9,0)(10,1);
+	METHOD : COG;
+	DEFAULT := 2.5;
+END_DEFUZZIFY
+
+RULEBLOCK kuralBlok1
+	AND : MIN;
+	ACT : MIN;
+	ACCU : MAX;
+	
+	RULE 1 : IF egitimSuresi IS az AND tecrube IS az AND cinsiyet IS erkek THEN maas IS cokAz;
+	RULE 2 : IF egitimSuresi IS az AND tecrube IS az AND cinsiyet IS kadin THEN maas IS cokAz;
+	RULE 3 : IF egitimSuresi IS orta AND tecrube IS az AND cinsiyet IS erkek THEN maas IS az;
+	RULE 4 : IF egitimSuresi IS orta AND tecrube IS az AND cinsiyet IS kadin THEN maas IS az;
+	RULE 5 : IF egitimSuresi IS cok AND tecrube IS az AND cinsiyet IS erkek THEN maas IS orta;
+	RULE 6 : IF egitimSuresi IS cok AND tecrube IS az AND cinsiyet IS kadin THEN maas IS orta;
+	RULE 7 : IF egitimSuresi IS az AND tecrube IS orta AND cinsiyet IS erkek THEN maas IS az;
+	RULE 8 : IF egitimSuresi IS az AND tecrube IS orta AND cinsiyet IS kadin THEN maas IS az;
+	RULE 9 : IF egitimSuresi IS orta AND tecrube IS orta AND cinsiyet IS erkek THEN maas IS orta;
+	RULE 10 : IF egitimSuresi IS orta AND tecrube IS orta AND cinsiyet IS kadin THEN maas IS orta;
+	RULE 11 : IF egitimSuresi IS cok AND tecrube IS orta AND cinsiyet IS erkek THEN maas IS fazla;
+	RULE 12 : IF egitimSuresi IS cok AND tecrube IS orta AND cinsiyet IS kadin THEN maas IS fazla;
+	RULE 13 : IF egitimSuresi IS az AND tecrube IS cok AND cinsiyet IS erkek THEN maas IS orta;
+	RULE 14 : IF egitimSuresi IS az AND tecrube IS cok AND cinsiyet IS kadin THEN maas IS orta;
+	RULE 15 : IF egitimSuresi IS orta AND tecrube IS cok AND cinsiyet IS erkek THEN maas IS fazla;
+	RULE 16 : IF egitimSuresi IS orta AND tecrube IS cok AND cinsiyet IS kadin THEN maas IS fazla;
+	RULE 17 : IF egitimSuresi IS cok AND tecrube IS cok AND cinsiyet IS erkek THEN maas IS asiriFazla;
+	RULE 18 : IF egitimSuresi IS cok AND tecrube IS cok AND cinsiyet IS kadin THEN maas IS asiriFazla;
+	
+END_RULEBLOCK
+
+END_FUNCTION_BLOCK
